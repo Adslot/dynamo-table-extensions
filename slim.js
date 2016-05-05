@@ -431,9 +431,6 @@ DynamoTable.prototype.batchGet = function(keys, options, tables, cb) {
     }, {}))
   }
 
-  if (allKeys.length > DynamoTable.MAX_GET)
-    console.log('Alarma!!', allKeys.length)
-
   for (i = 0; i < allKeys.length; i += DynamoTable.MAX_GET) {
     requestItems = {}
     for (j = i; j < i + DynamoTable.MAX_GET && j < allKeys.length; j++) {
