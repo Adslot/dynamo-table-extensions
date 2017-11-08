@@ -1,6 +1,6 @@
 {
   "name": "dynamo-table-extensions",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Adds higher-level methods to dynamo-table",
   "main": "index.js",
   "scripts": {
@@ -21,13 +21,7 @@
     "Dmitry Shirokov <deadrunk@gmail.com>"
   ],
   "license": "MIT",
-  "devDependencies": {
-    "should": "~2.0.2",
-    "mocha": "~1.13.0",
-    "dynalite": "~0.3.5",
-    "istanbul": "~0.1.44"
-  },
   "dependencies": {
-    "async": "~0.2.9"
+    "async": "^2.6.0"
   }
 }
