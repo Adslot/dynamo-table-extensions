@@ -1,6 +1,5 @@
+const async = require('async');
 var dynamo
-// , once = require('once')
-
 
 var once = function(func) {
   var ran = false, memo;
@@ -13,15 +12,6 @@ var once = function(func) {
   };
 };
 
-// try {
-//   dynamo = require('dynamo-client')
-// } catch (e) {
-//   // Assume consumer will pass in client
-// }
-
-module.exports = function(name, options) {
-  return new DynamoTable(name, options)
-}
 module.exports.DynamoTable = DynamoTable
 
 function DynamoTable(name, options) {
@@ -42,13 +32,9 @@ function DynamoTable(name, options) {
   this.writeCapacity = options.writeCapacity
   this.localIndexes = options.localIndexes || options.indexes
   this.globalIndexes = options.globalIndexes
-  // this.scanSegments = options.scanSegments
 
-  // !!!!!!!!!!!
-  // this.preMapFromDb = options.preMapFromDb
   this.postMapFromDb = options.postMapFromDb // needed
   this.preMapToDb = options.preMapToDb // needed
-  // this.postMapToDb = options.postMapToDb
 }
 
 DynamoTable.prototype.mapAttrToDb = function(val, key, jsObj) {
@@ -56,87 +42,10 @@ DynamoTable.prototype.mapAttrToDb = function(val, key, jsObj) {
     return val.toISOString()
 
   return val
-  // var mapping = this.mappings[key], numToStr = this._numToStr.bind(this, key)
-  // if (mapping) {
-  //   if (typeof mapping.to === 'function') return mapping.to(val, key, jsObj)
-  //   if (typeof val === 'undefined' || typeof val === 'function') return
-  //   if (mapping === 'json') return {S: JSON.stringify(val)}
-  //   if (val == null || val === '') return
-  //   switch (mapping) {
-  //     case 'S': return {S: String(val)}
-  //     case 'N': return {N: numToStr(val)}
-  //     case 'B': return {B: val.toString('base64')}
-  //     case 'SS': return {SS: typeof val[0] === 'string' ? val : val.map(String)}
-  //     case 'NS': return {NS: val.map(numToStr)}
-  //     case 'BS': return {BS: val.map(function(x) { return x.toString('base64') })}
-  //     case 'bignum': return Array.isArray(val) ? {NS: val} : {N: val}
-  //     case 'isodate': return {S: val.toISOString()}
-  //     case 'timestamp': return {N: numToStr(val)}
-  //     case 'mapS': return {SS: Object.keys(val)}
-  //     case 'mapN': return {NS: Object.keys(val)}
-  //     case 'mapB': return {BS: Object.keys(val)}
-  //   }
-  // }
-  // if (val == null || val === '') return
-  // switch (typeof val) {
-  //   case 'string': return {S: val}
-  //   case 'boolean': return {S: String(val)}
-  //   case 'number': return {N: numToStr(val)}
-  //   case 'function': return
-  // }
-  // if (Buffer.isBuffer(val)) {
-  //   if (!val.length) return
-  //   return {B: val.toString('base64')}
-  // }
-  // if (Array.isArray(val)) {
-  //   if (!val.length) return
-  //   if (typeof val[0] === 'string') return {SS: val}
-  //   if (typeof val[0] === 'number') return {NS: val.map(numToStr)}
-  //   if (Buffer.isBuffer(val[0])) return {BS: val.map(function(x) { return x.toString('base64') })}
-  // }
-  // // Other types (inc dates) are mapped as they are in JSON
-  // val = typeof val.toJSON === 'function' ? val.toJSON() : JSON.stringify(val)
-  // if (val) return {S: val}
 }
 
 DynamoTable.prototype.mapAttrFromDb = function(val, key, dbItem) {
   return val
-  // var mapping = this.mappings[key]
-  // if (mapping) {
-  //   if (typeof mapping.from === 'function') return mapping.from(val, key, dbItem)
-  //   switch (mapping) {
-  //     case 'S': return val.S
-  //     case 'N': return +val.N
-  //     case 'B': return new Buffer(val.B, 'base64')
-  //     case 'SS': return val.SS
-  //     case 'NS': return val.NS.map(Number)
-  //     case 'BS': return val.BS.map(function(x) { return new Buffer(x, 'base64') })
-  //     case 'json': return JSON.parse(val.S)
-  //     case 'bignum': return val.N != null ? val.N : val.NS
-  //     case 'isodate': return new Date(val.S)
-  //     case 'timestamp': return new Date(val.N)
-  //     case 'mapS':
-  //     case 'mapN':
-  //     case 'mapB':
-  //       return (val.SS || val.NS || val.BS).reduce(function(mapObj, val) {
-  //         mapObj[val] = 1
-  //         return mapObj
-  //       }, {})
-  //   }
-  // }
-  // if (val.S != null) {
-  //   if (val.S === 'true') return true
-  //   if (val.S === 'false') return false
-  //   if (val.S[0] === '{' || val.S[0] === '[')
-  //     try { return JSON.parse(val.S) } catch (e) {}
-  //   return val.S
-  // }
-  // if (val.N != null) return +val.N
-  // if (val.B != null) return new Buffer(val.B, 'base64')
-  // if (val.SS != null) return val.SS
-  // if (val.NS != null) return val.NS.map(Number)
-  // if (val.BS != null) return val.BS.map(function(x) { return new Buffer(x, 'base64') })
-  // throw new Error('Unknown DynamoDB type for "' + key + '": ' + JSON.stringify(val))
 }
 
 DynamoTable.prototype.mapToDb = function(jsObj) {
@@ -151,24 +60,11 @@ DynamoTable.prototype.mapToDb = function(jsObj) {
         dbItem[key] = dbAttr
     })
   }
-  // if (this.postMapToDb) dbItem = this.postMapToDb(dbItem)
+
   return dbItem
 }
 
 DynamoTable.prototype.mapFromDb = function(dbItem) {
-  // if (this.preMapFromDb) dbItem = this.preMapFromDb(dbItem)
-
-  // var self = this,
-  //     jsObj = dbItem != null ? {} : null
-
-  // if (dbItem != null && jsObj != null) {
-  //   Object.keys(dbItem).forEach(function(key) {
-  //     var jsAttr = self.mapAttrFromDb(dbItem[key], key, dbItem)
-  //     if (typeof jsAttr !== 'undefined')
-  //       jsObj[key] = jsAttr
-  //   })
-  // }
-
   // TODO: clone?
   var jsObj = dbItem;
 
@@ -206,23 +102,6 @@ DynamoTable.prototype._isEmpty = function(attr) {
     attr.SS === '[]' || attr.NS === '[]' || attr.BS === '[]'
 }
 
-// DynamoTable.prototype._getKeyType = function(attr) {
-//   var type = this.keyTypes[attr] || this.mappings[attr] || 'S'
-//   switch (type) {
-//     case 'N':
-//     case 'S':
-//     case 'B':
-//       return type
-//     case 'json':
-//     case 'isodate':
-//       return 'S'
-//     case 'bignum':
-//     case 'timestamp':
-//       return 'N'
-//   }
-//   throw new Error('Unsupported key type (' + type + ') for attr ' + attr)
-// }
-
 DynamoTable.prototype.get = function(key, options, cb) {
   if (!cb) { cb = options; options = {} }
   if (typeof cb !== 'function') throw new Error('Last parameter must be a callback function')
@@ -232,7 +111,7 @@ DynamoTable.prototype.get = function(key, options, cb) {
   options.Key = options.Key || this.resolveKey(key)
   this.client.request('GetItem', options, function(err, data) {
     if (err) return cb(err)
-    // console.log('data.Item', data.Item)
+
     cb(null, self.mapFromDb(data.Item))
   })
 }
@@ -327,24 +206,7 @@ DynamoTable.prototype.query = function(conditions, options, cb) {
   var self = this, nonKeys
 
   options.KeyConditions = options.KeyConditions || this.conditions(conditions)
-  // if (!options.IndexName) {
-  //   nonKeys = Object.keys(options.KeyConditions).filter(function(attr) { return !~self.key.indexOf(attr) })
-  //   if (nonKeys.length) {
-  //     // we have a non-key attribute, must find an IndexName
-  //     this.resolveLocalIndexes(this.localIndexes).forEach(function(index) {
-  //       if (index.key === nonKeys[0])
-  //         options.IndexName = index.name
-  //     })
-  //     if (!options.IndexName) {
-  //       nonKeys = Object.keys(options.KeyConditions)
-  //       this.resolveGlobalIndexes(this.globalIndexes).forEach(function(index) {
-  //         if (index.hashKey === nonKeys[0] && (!nonKeys[1] || index.rangeKey === nonKeys[1]))
-  //           options.IndexName = index.name
-  //       })
-  //     }
-  //     options.IndexName = options.IndexName || nonKeys[0]
-  //   }
-  // }
+
   this._listRequest('Query', options, cb)
 }
 
@@ -358,40 +220,13 @@ DynamoTable.prototype.scan = function(conditions, options, cb) {
   var totalSegments, segment, allItems
 
   if (conditions != null && !options.ScanFilter) options.ScanFilter = this.conditions(conditions)
-  // options.TotalSegments = options.TotalSegments || this.scanSegments
 
-  // if (options.Segment == null && options.TotalSegments) {
-  //   totalSegments = options.TotalSegments
-  //   allItems = new Array(totalSegments)
-  //   for (segment = 0; segment < totalSegments; segment++)
-  //     this.scan(null, cloneWithSegment(options, segment), checkDone(segment))
-  // } else {
   this._listRequest('Scan', options, cb)
-  // }
-
-  // function cloneWithSegment(options, segment) {
-  //   return Object.keys(options).reduce(function(clone, key) {
-  //     clone[key] = options[key]
-  //     return clone
-  //   }, {Segment: segment})
-  // }
-  // function checkDone(segment) {
-  //   return function (err, items) {
-  //     if (err) return cb(err)
-  //     allItems[segment] = items
-  //     if (!--totalSegments) {
-  //       if (options.Select === 'COUNT')
-  //         return cb(null, allItems.reduce(function(sum, count) { return sum + count }))
-  //       cb(null, [].concat.apply([], allItems))
-  //     }
-  //   }
-  // }
 }
 
 // http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchGetItem.html
 DynamoTable.MAX_GET = 250
 DynamoTable.prototype.batchGet = function(keys, options, tables, cb) {
-  // console.log('batchGet', this.name, keys)
   if (!cb) { cb = tables; tables = [] }
   if (!cb) { cb = options; options = {} }
   if (typeof cb !== 'function') throw new Error('Last parameter must be a callback function')
@@ -448,7 +283,7 @@ DynamoTable.prototype.batchGet = function(keys, options, tables, cb) {
 
   function batchRequest(requestItems, results, cb) {
     k = Object.keys(requestItems)[0]
-    //console.log('batch', k, requestItems[k].Keys.length)
+
     if (!cb) { cb = results; results = {} }
     self.client.request('BatchGetItem', {RequestItems: requestItems}, function(err, data) {
       if (err) return cb(err)
@@ -541,62 +376,7 @@ DynamoTable.prototype.createTable = function(readCapacity, writeCapacity, localI
   if (typeof cb !== 'function') throw new Error('Last parameter must be a callback function')
   options.TableName = options.TableName || this.name
   var self = this
-      // , attrMap = this.key.reduce(function(namesObj, attr) {
-      //   namesObj[attr] = true
-      //   return namesObj
-      // }, {})
 
-  // if (localIndexes && !options.LocalSecondaryIndexes) {
-  //   options.LocalSecondaryIndexes = this.resolveLocalIndexes(localIndexes).map(function(index) {
-  //     var lsi = {
-  //       IndexName: index.name,
-  //       KeySchema: [self.key[0], index.key].map(function(attr, ix) {
-  //         return { AttributeName: attr, KeyType: ix === 0 ? 'HASH' : 'RANGE' }
-  //       }),
-  //     }
-  //     if (typeof index.projection === 'string')
-  //       lsi.Projection = {ProjectionType: index.projection}
-  //     else if (Array.isArray(index.projection))
-  //       lsi.Projection = {ProjectionType: 'INCLUDE', NonKeyAttributes: index.projection}
-
-  //     attrMap[index.key] = true
-
-  //     return lsi
-  //   })
-  // }
-  // if (this.globalIndexes && !options.GlobalSecondaryIndexes) {
-  //   options.GlobalSecondaryIndexes = this.resolveGlobalIndexes(this.globalIndexes).map(function(index) {
-  //     var gsi = {
-  //       IndexName: index.name,
-  //       KeySchema: [index.hashKey, index.rangeKey].filter(function(attr) { return attr }).map(function(attr, ix) {
-  //         return { AttributeName: attr, KeyType: ix === 0 ? 'HASH' : 'RANGE' }
-  //       }),
-  //       ProvisionedThroughput: {
-  //         ReadCapacityUnits: index.readCapacity,
-  //         WriteCapacityUnits: index.writeCapacity,
-  //       }
-  //     }
-  //     if (typeof index.projection === 'string')
-  //       gsi.Projection = {ProjectionType: index.projection}
-  //     else if (Array.isArray(index.projection))
-  //       gsi.Projection = {ProjectionType: 'INCLUDE', NonKeyAttributes: index.projection}
-
-  //     attrMap[index.hashKey] = true
-  //     if (index.rangeKey) attrMap[index.rangeKey] = true
-
-  //     return gsi
-  //   })
-  // }
-  // options.KeySchema = options.KeySchema || this.key.map(function(attr, ix) {
-  //   return {AttributeName: attr, KeyType: ix === 0 ? 'HASH' : 'RANGE'}
-  // })
-  // options.AttributeDefinitions = options.AttributeDefinitions || Object.keys(attrMap).map(function(attr) {
-  //   return {AttributeName: attr, AttributeType: self._getKeyType(attr)}
-  // })
-  // options.ProvisionedThroughput = options.ProvisionedThroughput || {
-  //   ReadCapacityUnits: readCapacity,
-  //   WriteCapacityUnits: writeCapacity,
-  // }
   this.client.request('CreateTable', options, function(err, data) {
     if (err) return cb(err)
     cb(null, data.TableDescription)
@@ -614,23 +394,6 @@ DynamoTable.prototype.describeTable = function(options, cb) {
   })
 }
 
-// DynamoTable.prototype.updateTable = function(readCapacity, writeCapacity, options, cb) {
-//   if (!cb) { cb = options; options = {} }
-//   if (typeof cb !== 'function') throw new Error('Last parameter must be a callback function')
-//   options.TableName = options.TableName || this.name
-
-//   if (readCapacity && writeCapacity) {
-//     options.ProvisionedThroughput = options.ProvisionedThroughput || {
-//       ReadCapacityUnits: readCapacity,
-//       WriteCapacityUnits: writeCapacity,
-//     }
-//   }
-//   this.client.request('UpdateTable', options, function(err, data) {
-//     if (err) return cb(err)
-//     cb(null, data.TableDescription)
-//   })
-// }
-
 DynamoTable.prototype.deleteTable = function(options, cb) {
   if (!cb) { cb = options; options = {} }
   if (typeof cb !== 'function') throw new Error('Last parameter must be a callback function')
@@ -642,140 +405,29 @@ DynamoTable.prototype.deleteTable = function(options, cb) {
   })
 }
 
-// TODO: Support ExclusiveStartTableName/LastEvaluatedTableName
-// DynamoTable.prototype.listTables = function(options, cb) {
-//   if (!cb) { cb = options; options = {} }
-//   if (typeof cb !== 'function') throw new Error('Last parameter must be a callback function')
-
-//   this.client.request('ListTables', options, function(err, data) {
-//     if (err) return cb(err)
-//     cb(null, data.TableNames)
-//   })
-// }
-
-// DynamoTable.prototype.deleteTableAndWait = function(options, cb) {
-//   if (!cb) { cb = options; options = {} }
-//   if (typeof cb !== 'function') throw new Error('Last parameter must be a callback function')
-//   var self = this
-//   this.describeTable(function(err, data) {
-//     if (err && err.name === 'ResourceNotFoundException') return cb()
-//     if (err) return cb(err)
-
-//     if (data.TableStatus !== 'ACTIVE') return setTimeout(self.deleteTableAndWait.bind(self, options, cb), 1000)
-
-//     self.deleteTable(options, function(err) {
-//       if (err) return cb(err)
-//       self.deleteTableAndWait(options, cb)
-//     })
-//   })
-// }
-
-// DynamoTable.prototype.createTableAndWait = function(readCapacity, writeCapacity, localIndexes, options, cb) {
-//   if (!cb) { cb = options; options = {} }
-//   if (!cb) { cb = localIndexes; localIndexes = this.localIndexes }
-//   if (!cb) { cb = writeCapacity; writeCapacity = this.writeCapacity || 1 }
-//   if (!cb) { cb = readCapacity; readCapacity = this.readCapacity || 1 }
-//   if (typeof cb !== 'function') throw new Error('Last parameter must be a callback function')
-//   var self = this
-//   this.describeTable(function(err, data) {
-//     if (err && err.name === 'ResourceNotFoundException') {
-//       return self.createTable(readCapacity, writeCapacity, localIndexes, options, function(err) {
-//         if (err) return cb(err)
-//         self.createTableAndWait(readCapacity, writeCapacity, localIndexes, options, cb)
-//       })
-//     }
-//     if (err) return cb(err)
-
-//     if (data.TableStatus === 'ACTIVE') return cb()
-//     if (data.TableStatus !== 'CREATING') return cb(new Error(data.TableStatus))
-
-//     setTimeout(self.createTableAndWait.bind(self, readCapacity, writeCapacity, localIndexes, options, cb), 1000)
-//   })
-// }
-
-// DynamoTable.prototype.updateTableAndWait = function(readCapacity, writeCapacity, options, cb) {
-//   if (!cb) { cb = options; options = {} }
-//   if (typeof cb !== 'function') throw new Error('Last parameter must be a callback function')
-//   options.TableName = options.TableName || this.name
-//   var self = this
-
-//   self.updateTable(readCapacity, writeCapacity, options, function(err) {
-//     if (err) return cb(err)
-
-//     // check whether the update has in fact been applied
-//     function checkTable(count) {
-//       // Make sure we don't go into an infinite loop
-//       if (++count > 1000) return cb(new Error('Wait limit exceeded'))
-
-//       self.describeTable(function(err, data) {
-//         if (err) return cb(err)
-//         if (data.TableStatus !== 'ACTIVE' || (data.GlobalSecondaryIndexes &&
-//             !data.GlobalSecondaryIndexes.every(function (idx) {return idx.IndexStatus === 'ACTIVE'}))) {
-//           return setTimeout(checkTable, 1000, count)
-//         }
-
-//         // If the table is ACTIVE then return
-//         cb(null, data)
-//       })
-//     }
-//     checkTable(1)
-//   })
-// }
-
-
-// DynamoTable.prototype.increment = function(key, attr, incrAmt, options, cb) {
-//   var self = this, actions
-//   if (!cb) { cb = options; options = {} }
-//   if (!cb) { cb = incrAmt; incrAmt = 1 }
-//   if (typeof cb !== 'function') throw new Error('Last parameter must be a callback function')
-
-//   options.ReturnValues = options.ReturnValues || 'UPDATED_NEW'
-//   actions = {add: {}}
-//   actions.add[attr] = incrAmt
-//   this.update(key, actions, options, function(err, data) {
-//     if (err) return cb(err)
-//     var newVal = (data.Attributes != null ? data.Attributes[attr] : null)
-//     if (newVal == null) return cb()
-//     cb(null, self.mapAttrFromDb(newVal, attr))
-//   })
-// }
-
 DynamoTable.prototype._listRequest = function(operation, items, options, cb) {
   if (!cb) { cb = options; options = items; items = [] }
   if (typeof cb !== 'function') throw new Error('Last parameter must be a callback function')
   var self = this
 
-  // console.log('list opts', options)
   this.client.request(operation, options, function(err, data) {
     if (err) return cb(err)
     if (options.Select === 'COUNT') return cb(null, data.Count)
 
     // When we fetch only few fields it doesn't require
     // mapping as it's not longer a valid model, right?
-    // console.log(options.AttributesToGet)
     if (options.AttributesToGet && options.AttributesToGet.length)
       return cb(null, data.Items)
 
     for (var i = data.Items.length - 1; i >= 0; i--) {
       data.Items[i] = self.mapFromDb(data.Items[i])
     };
-     // = items.concat(data.Items.map(function(item) { return self.mapFromDb(item) }))
-    // items = items.concat(data.Items.map(function(item) { return self.mapFromDb(item) }))
-    // if (data.LastEvaluatedKey != null && (!options.Limit || options.Limit !== (data.ScannedCount || data.Count))) {
-    //   options.ExclusiveStartKey = data.LastEvaluatedKey
-    //   return self._listRequest(operation, items, options, cb)
-    // }
+
     cb(null, data.Items)
   })
 }
 
 DynamoTable.prototype.conditions = function(conditionExprObj) {
-  // var self = this
-  // return Object.keys(conditionExprObj).reduce(function(condObj, attr) {
-  //   condObj[attr] = self.condition(attr, conditionExprObj[attr])
-  //   return condObj
-  // }, {})
-  //
   var condObj = {}
   for (var k in conditionExprObj)
     condObj[k] = this.condition(k, conditionExprObj[k])
@@ -839,60 +491,6 @@ DynamoTable.prototype.comparison = function(comparison) {
   return comparison.toUpperCase()
 }
 
-// local indexes:
-// [attr1/name1, attr2/name2]
-// {name: attr1}
-// {name: {key: attr1, projection: 'KEYS_ONLY'}}
-// {name: {key: attr1, projection: [attr1, attr2]}}
-// [{name: name1, key: attr1}, {name: name2, key: attr2}]
-// DynamoTable.prototype.resolveLocalIndexes = function(indexes) {
-//   if (!indexes) return []
-//   if (!Array.isArray(indexes)) {
-//     indexes = Object.keys(indexes).map(function(name) {
-//       var index = indexes[name]
-//       if (typeof index === 'string') index = {key: index}
-//       return {name: name, key: index.key, projection: index.projection}
-//     })
-//   }
-//   return indexes.map(function(index) {
-//     if (typeof index === 'string') index = {name: index, key: index}
-//     index.projection = index.projection || 'ALL'
-//     return index
-//   })
-// }
-
-// global indexes:
-// [attr1/name1, attr2/name2]
-// {name: attr1}
-// {name: {key: attr1, projection: 'KEYS_ONLY'}}
-// {name: {key: attr1, projection: [attr1, attr2]}}
-// [{name: name1, key: attr1}, {name: name2, key: attr2}]
-// DynamoTable.prototype.resolveGlobalIndexes = function(indexes) {
-//   if (!indexes) return []
-//   if (!Array.isArray(indexes)) {
-//     indexes = Object.keys(indexes).map(function(name) {
-//       var index = indexes[name]
-//       if (typeof index === 'string') index = {hashKey: index}
-//       return {
-//         name: name,
-//         hashKey: index.hashKey,
-//         rangeKey: index.rangeKey,
-//         projection: index.projection,
-//         readCapacity: index.readCapacity,
-//         writeCapacity: index.writeCapacity,
-//       }
-//     })
-//   }
-//   return indexes.map(function(index) {
-//     if (typeof index === 'string') index = {name: index}
-//     index.hashKey = index.hashKey || index.name
-//     index.projection = index.projection || 'ALL'
-//     index.readCapacity = index.readCapacity || 1
-//     index.writeCapacity = index.writeCapacity || 1
-//     return index
-//   })
-// }
-
 DynamoTable.prototype._getDefaultOptions = function(options) {
   if (options == null)
     options = {}
@@ -904,9 +502,53 @@ DynamoTable.prototype._getDefaultOptions = function(options) {
   return options
 }
 
-// DynamoTable.prototype._numToStr = function(attr, num) {
-//   var numStr = String(+num)
-//   if (numStr === 'NaN' || numStr === 'Infinity' || numStr === '-Infinity')
-//     throw new Error('Cannot convert attribute "' + attr + '" to DynamoDB number: ' + num)
-//   return numStr
-// }
+// Ensures that no more than capacityRatio * writeCapacity items are written per second
+DynamoTable.prototype.throttledBatchWrite = function(capacityRatio, items, cb) {
+  if (!(capacityRatio > 0)) return cb(new Error('non-positive capacityRatio'))
+
+  var self = this
+  self.describeTable(function(err, info) {
+    if (err) return cb(err)
+
+    var itemsPerSecond = Math.ceil(info.ProvisionedThroughput.WriteCapacityUnits * capacityRatio);
+    var written = 0;
+    var ready = true;
+
+    var waitAndWrite = function(cb) {
+      async.until(function() {return ready}, function(cb) {setTimeout(cb, 10)}, function(err) {
+        if (err) return cb(err)
+        ready = false
+        setTimeout(function() {ready = true}, 1000)
+
+        var write = items.slice(written, written + itemsPerSecond)
+        self.batchWrite(write, function(err) {
+          if (err) return cb(err)
+          written += write.length;
+          cb();
+        })
+      })
+    }
+
+    async.whilst(function() {return written < items.length}, waitAndWrite, cb)
+  })
+}
+
+DynamoTable.prototype.truncate = function(cb) {
+  async.series([this.deleteTable.bind(this), this.createTable.bind(this)], cb)
+}
+
+DynamoTable.prototype.addNew = function(record, cb) {
+  var key = Array.isArray(this.key) ? this.key[0] : this.key;
+
+  if (record[key])
+    return this.put(record, cb);
+
+  var self = this;
+
+  // this.nextId is added by `dynamo-table-id`, which must be loaded
+  this.nextId(function(err, id) {
+    if (err) return cb(err);
+    record[key] = id;
+    self.put(record, cb);
+  });
+}
