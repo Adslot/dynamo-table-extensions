@@ -1,7 +1,7 @@
 dynamo-table-extensions
 =======================
 
-[![Build Status](https://secure.travis-ci.org/xarvh/dynamo-table-extensions.png?branch=master)](http://travis-ci.org/xarvh/dynamo-table-extensions)
+[![Build Status](https://api.travis-ci.org/Adslot/dynamo-table-extensions.png)](http://travis-ci.org/Adslot/dynamo-table-extensions)
 
 Adds higher-level methods to [dynamo-table](https://github.com/mhart/dynamo-table).
 
