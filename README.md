@@ -2,7 +2,7 @@ dynamo-table-extensions
 =======================
 
 [![npm version](https://badge.fury.io/js/dynamo-table-extensions.svg)](https://badge.fury.io/js/dynamo-table-extensions)
-![Build Status](https://github.com/Adslot/dynamo-table-extensions/workflows/Node.js%20CI/badge.svg)
+![Build Status](https://github.com/Adslot/dynamo-table-extensions/actions/workflows/node.js.yml/badge.svg)
 
 Adds higher-level methods to [dynamo-table](https://github.com/mhart/dynamo-table).
 
