@@ -1,6 +1,6 @@
 {
   "name": "dynamo-table-extensions",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Adds higher-level methods to dynamo-table",
   "main": "index.js",
   "scripts": {
