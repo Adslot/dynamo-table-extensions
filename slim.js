@@ -144,6 +144,7 @@ DynamoTable.prototype.update = function(key, actions, options, cb) {
   // If actions is a string or array, then it's a whitelist for attributes to update
   if (typeof actions === 'string') actions = [actions]
   if (Array.isArray(actions)) { pick = actions; actions = key; key = null }
+  if (!actions) { actions = key; key = null }
 
   // If key is null, assume actions has a full object to put so clone it (without keys)
   if (key == null) {
@@ -315,7 +316,16 @@ DynamoTable.prototype.batchGet = function(keys, options, tables, cb) {
 
 // http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html
 DynamoTable.MAX_WRITE = 25
-DynamoTable.prototype.batchWrite = function(operations, tables, cb) {
+DynamoTable.prototype.batchWrite = function(operations, tables, options, cb) {
+  if (!cb) { 
+    cb = options; 
+    if (Object.prototype.toString.call(tables) === '[object Object]') {
+      options = tables;
+      tables = [];
+    } else {
+      options = {}
+    } 
+  }
   if (!cb) { cb = tables; tables = [] }
   if (typeof cb !== 'function') throw new Error('Last parameter must be a callback function')
   cb = once(cb)
@@ -353,7 +363,8 @@ DynamoTable.prototype.batchWrite = function(operations, tables, cb) {
   }
 
   function batchRequest(requestItems, cb) {
-    self.client.request('BatchWriteItem', {RequestItems: requestItems}, function(err, data) {
+    options.RequestItems = requestItems
+    self.client.request('BatchWriteItem', options, function(err, data) {
       if (err) return cb(err)
       if (Object.keys(data.UnprocessedItems || {}).length)
         return batchRequest(data.UnprocessedItems, cb)
