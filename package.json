@@ -27,7 +27,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "async": "^3.2.4"
+    "async": "^3.2.5"
   },
   "devDependencies": {
     "mocha": "^10.2.0"
