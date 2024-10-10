@@ -30,7 +30,7 @@
     "async": "^3.2.5"
   },
   "devDependencies": {
-    "mocha": "^10.5.2"
+    "mocha": "^10.7.3"
   },
   "engines": {
     "node": "^20"
