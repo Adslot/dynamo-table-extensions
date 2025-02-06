@@ -1,12 +1,12 @@
-const {promisify} = require('util');
-const {DynamoTable} = require('./slim');
+const { promisify } = require('util');
+const { DynamoTable } = require('./slim');
 
 const isCallback = (fn) => typeof fn === 'function';
 
 const validateCall = (methodName, args, minLength) => {
   if (args.length < minLength)
     throw new Error(`Incorrect args supplied to method ${methodName}: expected: ${minLength} got: ${args.length}`);
-}
+};
 
 /**
   Provides an adapter for the DynamoTable class to allow for promisified
@@ -18,14 +18,14 @@ class DynamoAdapter {
     this.hooks = options.hooks || {};
 
     // Delegate externally accessed properties
-    Object.keys(this._delegate).forEach(key => {
+    Object.keys(this._delegate).forEach((key) => {
       this[key] = this._delegate[key];
     });
 
     // NOTE: Rebind all methods so they can be passed without the class instance
     // Since we only instantiate once per table and maintain the instances,
     // the performance should be a big concern
-    Object.getOwnPropertyNames(DynamoAdapter.prototype).forEach(key => {
+    Object.getOwnPropertyNames(DynamoAdapter.prototype).forEach((key) => {
       if (typeof this[key] === 'function') this[key] = this[key].bind(this);
     });
 

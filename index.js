@@ -1,4 +1,4 @@
-const {DynamoTable} = require('./slim');
+const { DynamoTable } = require('./slim');
 const DynamoAdapter = require('./dynamo-adapter');
 
 // Library is a factory function which also provides the DynamoTable class
