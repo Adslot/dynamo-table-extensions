@@ -36,8 +36,8 @@
   "devDependencies": {
     "eslint": "^9.37.0",
     "eslint-config-adslot": "^2.2.0",
-    "mocha": "^11.7.4",
-    "prettier": "^3.6.2"
+    "mocha": "^11.7.5",
+    "prettier": "^3.7.3"
   },
   "prettier": {
     "singleQuote": true,
