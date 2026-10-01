@@ -34,7 +34,7 @@
     "async": "^3.2.6"
   },
   "devDependencies": {
-    "eslint": "^9.39.4",
+    "eslint": "^9.39.5",
     "eslint-config-adslot": "^2.2.1",
     "mocha": "^11.7.6",
     "prettier": "^3.9.5"
